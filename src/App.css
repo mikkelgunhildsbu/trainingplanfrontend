@@ -1,22 +1,161 @@
-.Body{
-    align-content: center;
-    background-color: whitesmoke;
+#popup-2 {
+    background-color: #4C424A;
+    border-radius: 4px;
+    border-color: #FFE787;
 }
 
-.PopUp {
+.popUpEmpty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #FFE787;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nonEmpty {
+    justify-content: space-between; /* This will push children to the edges */
+    width: 80%; /* Ensure it spans the full width */
+}
+.inputs{
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center
+}
+.buttons {
+    display: flex;
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Put maximum space between text and button group */
+    gap: 10px; /* Space between items */
+    padding: 10px; /* Padding around the whole container */
+}
+
+.workoutInfo {
+    color: #4C424A;
+    flex: 1 1 auto; /* Allows the h5 to grow and shrink but initially be as wide as possible */
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 10px;
+}
+
+.actionBtn {
+    padding: 10px 15px; /* Increase padding for better visual */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    background-color: #4C424A;
+    transition: background-color 0.3s;
+    /* Add any additional button styling here */
+}
+
+.actionBtn:hover {
+    background-color: #5D5560; /* Darker shade on hover */
+}
+
+.field {
+    position: relative;
+    margin-bottom: 20px;
+    align-content: center;
+    width: 50%;
+    text-align: center;
+}
+
+#intervallInfo{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 18.75%;
+
+}
+
+#intervallInfo.field{
+    width: 75%;
+}
+
+
+
+.field input,
+.field select, .field textarea {
+    width: 100%;
     padding: 10px;
+    border-radius: 4px;
+    border: 2px solid #7D7375;
+    font-size: 1rem;
 }
 
-.PopUp > div {
-    margin: 5px 0; /* Add some vertical spacing between rows */
-    text-align: center; /* Center the text */
+.field label {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    background-color: #FFE787;
+    border-radius: 2px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+    color: #4C424A;
 }
 
-.PopUp input {
-    margin-left: 5px; /* Add some spacing after labels */
+.field p {
+    margin-bottom: 5px;
+    font-weight: bold;
 }
+
+
+.submitBtn {
+    width: 50%;
+    height: 40px;
+    background-color: #4C424A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.submitBtn:hover {
+    background-color: #5D5560;
+}
+
+.popUpTitle{
+    background-color: #4C424A;
+    text-align: center;
+    color: white;
+    margin-bottom: 3px;
+}
+
+
+.calendarCell {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    min-height: 50px; /* Adjust as needed */
+    border-bottom: 1px solid #eaeaea; /* Optional */
+}
+
+.workoutEntry {
+    font-size: small;
+    padding: 3px;
+    border-radius: 4px;
+    margin-bottom: 2px; /* Spacing for multiple entries */
+}
+
+.showMore {
+    font-size: small;
+    color: #4C424A;
+    cursor: pointer;
+}
+
+.noWorkout {
+    color: #999;
+    font-size: small;
+}
+
+
