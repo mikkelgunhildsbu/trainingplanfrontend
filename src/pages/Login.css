@@ -1,0 +1,80 @@
+body{
+    background-color: #fff9e6;
+}
+
+.login-view {
+    align-items: center;
+    background-color: #0288D10A;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100vh; /* Viewport Height */
+    justify-content: center;
+    padding: 0% 10%; /* Relative to parent dimensions */
+    position: relative;
+}
+
+.login-view .form {
+    align-items: center;
+    background-color: #FFE787;
+    box-shadow: 0px 8px 8px #4C424A;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 800px;
+    max-height: 80vh;
+    justify-content: center;
+    width: 80%;
+    max-width: 800px;
+    margin: auto;
+    position: relative;
+}
+
+/* For smaller devices */
+@media screen and (max-width: 768px) {
+    .login-view .form {
+        width: 90%;
+    }
+}
+
+.login-view .text-wrapper-3,
+.login-view .text-wrapper-4 {
+    width: 100%;
+    max-width: 800px;
+    font-size: 120%;
+    font-family: "Arial Black";
+    text-align: center; /* To center the text within its container */
+}
+
+.login-view .span {
+    width: 100%;
+    max-width: 800px;
+}
+
+.button-instance {
+    display: flex !important; /* Consider avoiding !important unless necessary */
+    height: 14.4%; /* Relative to parent dimensions */
+    width: 80%; /* This can be adjusted according to your needs */
+    margin: 0 auto; /* Centering the button horizontally */
+}
+
+.login-view .link-instance,
+.login-view .text-field-instance{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 80%;
+    max-width: 793px;
+    margin: 20px auto
+}
+
+.login-view .design-component-instance-node{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 80%;
+    max-width: 793px;
+    margin: 20px auto
+}

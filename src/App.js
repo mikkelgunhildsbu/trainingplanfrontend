@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
-import { Calendar } from 'rsuite';
+import {Calendar} from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import Header from './Components/Header/Header';
+import Footer from './Components/Footer/Footer';
+import {parseJwrt} from "./funcs/parseJwrt";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import axios from "axios";
+import Cookies from 'js-cookie';
+
 
 function App() {
     const [showPopup, setShowPopup] = useState(false);
@@ -17,6 +21,13 @@ function App() {
     const [workoutsByDate, setWorkoutsByDate] = useState({});
     const [isWorkoutOnSelectedDate, setIsWorkoutOnSelectedDate] = useState(false);
     const [workoutsOnSelectedDate, setWorkoutsOnSelectedDate] = useState([]);
+
+
+
+
+    let token = Cookies.get("Token")
+    const payload = parseJwrt(token);
+    let userId = payload.customerId;
 
 
 
@@ -56,7 +67,7 @@ function App() {
         "workoutDate": selectedDate,
         "role": roleValue,
         "completed": false,
-        "user": {"customerId": 1},
+        "user": {"customerId": userId},
         "workOutDescription" :descriptionValue
     };
 
@@ -77,7 +88,10 @@ function App() {
 
     async function getWorkoutsById() {
         try {
-            const response = await axios.get("http://localhost:8082/customers/1/workouts");
+            const response = await axios.get(`http://localhost:8082/customers/${userId}/workouts`,{
+                headers: {
+                    "Authorization": token,
+                }});
             return response.data;
         } catch (error) {
             console.error(error);
@@ -199,118 +213,156 @@ function App() {
         })
     }
 
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const isoString = date.toISOString();
+        return isoString.split('T')[0];
+    }
+
+
+    function todaysWorkout() {
+        const formattedToday = formatDate(new Date());
+
+        const todaysWorkouts = workoutsByDate[formattedToday];
+
+        if (todaysWorkouts && todaysWorkouts.length > 0) {
+            return todaysWorkouts.map((workout, index) => (
+                <div key={index}>
+                    <p>{workout.role}</p>
+                    <p>{workout.workOutName} - {workout.distance} km</p>
+
+                </div>
+            ));
+        } else {
+            return <p>No workouts scheduled for today.</p>;
+        }
+    }
+
+
+
 
     return (
         <div className={"Body"}>
             <Header />
-            <div style={{display: 'block', width: "80%", marginLeft:"10%", textAlign:"center"}}>
-                <h4>Calendar</h4>
-                <Calendar
-                    bordered={true}
-                    onSelect={handleDateChange}
-                    isoWeek={true}
-                    renderCell={renderCalendarCell}
-                />
-            </div>
-
-            <Popup className={"pop"} open={showPopup} onClose={() => {
-                setShowPopup(false);
-                setWorkoutValue('');
-                setDistanceValue('');
-                setDescriptionValue('');
-                setRoleValue('EASY');
-                setSelectedWorkoutIdForUpdate(null)
-                setSelectedWorkoutIdForView(null)
-            }}
-                   position="right center"
-            >
-                <div className={"PopUp"} >
-                    <h4 className={"popUpTitle"}>{selectedDate ? selectedDate.toDateString() : 'No date selected'}</h4>
-                    {isWorkoutOnSelectedDate ? (
-                        //Workout already added
-                        <div className={"popUpEmpty"}>
-                            {workoutsOnSelectedDate.map((workout, index) => (
-                                <div key={index} className={"nonEmpty"} >
-                                    <div className={"buttons"}>
-
-                                        <h5 className={"workoutInfo"} style={{color:"#4C424A", textDecoration:completedLine[workout.completed]}}>{workout.workOutName} - {workout.distance} km ({workout.role}) </h5>
-                                        <div className={"buttonGroup"}>
-                                            {(workout.completed === false) && (
-                                                <button className={"actionBtn"} onClick={ () => handleCompleteClick(workout.workoutID)}>Completed</button>
-                                            )}
-                                        <button id={"viewButton"} className={"actionBtn"} onClick={() => handleViewClick(workout)} >View</button>
-                                            <button className={"actionBtn"} onClick={() => handleUpdateClick(workout)}>Update</button>
-                                        <button className={"actionBtn"} style={{marginLeft:"3px"}} onClick={() => deleteWorkoutsById(workout.workoutID)}>Delete</button>
-                                        </div>
-
-                                    </div>
-                                    {(selectedWorkoutIdForView === workout.workoutID) && (
-                                        <div className={"field"}>
-                                            <p>{workout.workOutDescription}</p>
-                                        </div>
-                                    )}
-                                    {(selectedWorkoutIdForUpdate === workout.workoutID) && (
-                                        <div className={"inputs"}>
-                                            <div className="field">
-                                                <input id="workoutName" type="text"  value={workoutValue} onChange={handleWorkoutChange}/>
-                                                <label htmlFor="workoutName">Workout Name</label>
-                                            </div>
-                                            <div className="field">
-                                                <input id="distance" type="number" step="0.01" value={distanceValue} placeholder=" " onChange={handleDistanceChange}/>
-                                                <label htmlFor="distance">Distance (km)</label>
-                                            </div>
-                                            <div className="field">
-                                                <select name="roles" value={roleValue} onChange={handleRoleChange}>
-                                                    <option value="EASY">Easy</option>
-                                                    <option value="TEMPO">Tempo</option>
-                                                    <option value="INTERVALL">Intervall</option>
-                                                    <option value="RECOVERY">Recovery</option>
-                                                </select>
-                                                <label htmlFor="role">Role</label>
-                                            </div>
-                                            <button className={"submitBtn"} onClick={() => updateWorkout(workout.workoutID)}>Update workout</button>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                            <button className={"submitBtn"} onClick={addNewWorkout}>New workout</button>
+            <div className={"mainContainer"}>
+                <div className={"sideContainer"}>
+                    <div className={"sideBox"}>
+                        <h6>Todays workout(s)</h6>
+                        {todaysWorkout()}
 
 
-                        </div>
-                    ) : (
-                        //Workout not added
-                        <div className="popUpEmpty">
-                            <div className="field">
-                                <input id="workoutName" type="text" placeholder=" " value={workoutValue} onChange={handleWorkoutChange}/>
-                                <label htmlFor="workoutName">Workout Name</label>
-                            </div>
-                            <div className="field">
-                                <input id="distance" type="number" step="0.01" value={distanceValue} placeholder=" " onChange={handleDistanceChange}/>
-                                <label htmlFor="distance">Distance (km)</label>
-                            </div>
-                            <div className="field">
-                                <select name="roles" value={roleValue} onChange={handleRoleChange}>
-                                    <option value="EASY">Easy</option>
-                                    <option value="TEMPO">Tempo</option>
-                                    <option value="INTERVALL">Interval</option>
-                                    <option value="RECOVERY">Recovery</option>
-                                </select>
-                                <label htmlFor="role">Role</label>
-                            </div>
-                            { (roleValue === 'TEMPO' || roleValue === "INTERVALL") && (
-                                <div className="field additionalInfo">
-                                    <textarea value={descriptionValue} onChange={handleDescriptionChange} name="roledescription" id="roleD" cols="40" rows="3"></textarea>
-                                    <label htmlFor="description">Additional description for {roleValue} workout</label>
-                                </div>
-                            )}
-
-                            <button className="submitBtn" onClick={createNewWorkout}>Submit</button>
-                        </div>
-
-                    )}
+                    </div>
+                    <div className={"sideBox"}>Box 2</div>
+                    <div className={"sideBox"}>Box 3</div>
                 </div>
-            </Popup>
+                <div className={"calendarContainer"} >
+                    <h4>Calendar</h4>
+                    <Calendar
+                        bordered={true}
+                        onSelect={handleDateChange}
+                        isoWeek={true}
+                        renderCell={renderCalendarCell}
+                    />
+                </div>
 
+                <Popup className={"pop"} open={showPopup} onClose={() => {
+                    setShowPopup(false);
+                    setWorkoutValue('');
+                    setDistanceValue('');
+                    setDescriptionValue('');
+                    setRoleValue('EASY');
+                    setSelectedWorkoutIdForUpdate(null)
+                    setSelectedWorkoutIdForView(null)
+                }}
+                       position="right center"
+                >
+                    <div className={"PopUp"} >
+                        <h4 className={"popUpTitle"}>{selectedDate ? selectedDate.toDateString() : 'No date selected'}</h4>
+                        {isWorkoutOnSelectedDate ? (
+                            //Workout already added
+                            <div className={"popUpEmpty"}>
+                                {workoutsOnSelectedDate.map((workout, index) => (
+                                    <div key={index} className={"nonEmpty"} >
+                                        <div className={"buttons"}>
+
+                                            <h5 className={"workoutInfo"} style={{color:"#4C424A", textDecoration:completedLine[workout.completed]}}>{workout.workOutName} - {workout.distance} km ({workout.role}) </h5>
+                                            <div className={"buttonGroup"}>
+                                                {(workout.completed === false) && (
+                                                    <button className={"actionBtn"} onClick={ () => handleCompleteClick(workout.workoutID)}>Completed</button>
+                                                )}
+                                            <button id={"viewButton"} className={"actionBtn"} onClick={() => handleViewClick(workout)} >View</button>
+                                                <button className={"actionBtn"} onClick={() => handleUpdateClick(workout)}>Update</button>
+                                            <button className={"actionBtn"} style={{marginLeft:"3px"}} onClick={() => deleteWorkoutsById(workout.workoutID)}>Delete</button>
+                                            </div>
+
+                                        </div>
+                                        {(selectedWorkoutIdForView === workout.workoutID) && (
+                                            <div className={"field"}>
+                                                <p>{workout.workOutDescription}</p>
+                                            </div>
+                                        )}
+                                        {(selectedWorkoutIdForUpdate === workout.workoutID) && (
+                                            <div className={"inputs"}>
+                                                <div className="field">
+                                                    <input id="workoutName" type="text"  value={workoutValue} onChange={handleWorkoutChange}/>
+                                                    <label htmlFor="workoutName">Workout Name</label>
+                                                </div>
+                                                <div className="field">
+                                                    <input id="distance" type="number" step="0.01" value={distanceValue} placeholder=" " onChange={handleDistanceChange}/>
+                                                    <label htmlFor="distance">Distance (km)</label>
+                                                </div>
+                                                <div className="field">
+                                                    <select name="roles" value={roleValue} onChange={handleRoleChange}>
+                                                        <option value="EASY">Easy</option>
+                                                        <option value="TEMPO">Tempo</option>
+                                                        <option value="INTERVALL">Intervall</option>
+                                                        <option value="RECOVERY">Recovery</option>
+                                                    </select>
+                                                    <label htmlFor="role">Role</label>
+                                                </div>
+                                                <button className={"submitBtn"} onClick={() => updateWorkout(workout.workoutID)}>Update workout</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                <button className={"submitBtn"} onClick={addNewWorkout}>New workout</button>
+
+
+                            </div>
+                        ) : (
+                            <div className="popUpEmpty">
+                                <div className="field">
+                                    <input id="workoutName" type="text" placeholder=" " value={workoutValue} onChange={handleWorkoutChange}/>
+                                    <label htmlFor="workoutName">Workout Name</label>
+                                </div>
+                                <div className="field">
+                                    <input id="distance" type="number" step="0.01" value={distanceValue} placeholder=" " onChange={handleDistanceChange}/>
+                                    <label htmlFor="distance">Distance (km)</label>
+                                </div>
+                                <div className="field">
+                                    <select name="roles" value={roleValue} onChange={handleRoleChange}>
+                                        <option value="EASY">Easy</option>
+                                        <option value="TEMPO">Tempo</option>
+                                        <option value="INTERVALL">Interval</option>
+                                        <option value="RECOVERY">Recovery</option>
+                                    </select>
+                                    <label htmlFor="role">Role</label>
+                                </div>
+                                { (roleValue === 'TEMPO' || roleValue === "INTERVALL") && (
+                                    <div className="field additionalInfo">
+                                        <textarea value={descriptionValue} onChange={handleDescriptionChange} name="roledescription" id="roleD" cols="40" rows="3"></textarea>
+                                        <label htmlFor="description">Additional description for {roleValue} workout</label>
+                                    </div>
+                                )}
+
+                                <button className="submitBtn" onClick={createNewWorkout}>Submit</button>
+                            </div>
+                        )}
+                    </div>
+                </Popup>
+
+            </div>
+            <Footer />
         </div>
     );
 }

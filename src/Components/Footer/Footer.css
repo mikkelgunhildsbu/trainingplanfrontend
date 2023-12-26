@@ -1,0 +1,16 @@
+.footer {
+    background-color: #333; /* Dark background for the footer */
+    color: #fff; /* White text color */
+    text-align: center; /* Center the text */
+    padding: 20px 0; /* Padding above and below the text */
+    position: relative; /* Position relative for further positioning if needed */
+    bottom: 0; /* Stick to the bottom if needed */
+    width: 100%; /* Ensure it takes full width */
+}
+
+.footer-content {
+    margin: 0 auto; /* Center the footer content if there's a set width */
+    padding: 10px; /* Padding inside the footer content */
+    max-width: 1200px; /* Maximum width of the content, can adjust as needed */
+    font-size: 0.8rem; /* Smaller font size for footer text */
+}
